@@ -1,11 +1,9 @@
 <script>
-    import { browser } from '$app/environment';
     import { onMount, onDestroy } from "svelte";
-    let result = null;
-    let worker;
+    import { loadDatasets } from '../lib/simulation/simulation.js';
 
-    let updateHz = 30;
-    let drawHz = 20;
+    const updateHz = 30;
+    const drawHz = 20;
 
     let updateTimer;
     let drawTimer;
@@ -38,31 +36,14 @@
         updateTimer = setInterval(update, 1000 / updateHz);
         drawTimer = setInterval(draw, 1000 / drawHz);
 
-        if (browser){
-            worker.postMessage({});
-        }
-        else{
-            console.log("Error browser not loaded yet!")
-        }
+        //Load in data
+        loadDatasets();
 
         return () => {
             clearInterval(updateTimer);
             clearInterval(drawTimer);
         };
     });
-
-    //Loads in resources
-    if (browser) {
-        //Uses workers to offload loading
-        worker = new Worker(
-            new URL('$lib/simulation/simulation-worker.js', import.meta.url),
-            { type: 'module' }
-        );
-
-        worker.onmessage = (event) => {
-            result = event.data;
-        };
-    }
 </script>
 
 <div class="p-6 max-w-xl mx-auto">

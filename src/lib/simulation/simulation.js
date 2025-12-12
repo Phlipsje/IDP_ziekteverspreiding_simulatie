@@ -4,9 +4,12 @@ import csvGeografieText from '../assets/datasets/IDP-geografie-dataset.csv?raw';
 
 //Entry point of simulation
 
+let bevolkingData;
+let geografieData;
+
 export function loadDatasets(){
-    const bevolkingData = Papa.parse(csvBevolkingText, {header: true}).data;
-    const geografieData = Papa.parse(csvGeografieText, {header: true}).data;
+    bevolkingData = Papa.parse(csvBevolkingText, {header: true}).data;
+    geografieData = Papa.parse(csvGeografieText, {header: true}).data;
 
     return bevolkingData;
 }

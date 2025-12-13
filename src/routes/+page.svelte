@@ -1,6 +1,6 @@
 <script>
     import { onMount, onDestroy } from "svelte";
-    import { loadDatasets } from '../lib/simulation/simulation.js';
+    import { load } from '../lib/simulation/simulation.js';
 
     const updateHz = 30;
     const drawHz = 20;
@@ -36,8 +36,8 @@
         updateTimer = setInterval(update, 1000 / updateHz);
         drawTimer = setInterval(draw, 1000 / drawHz);
 
-        //Load in data
-        loadDatasets();
+        //Prepare all the simulation data
+        load();
 
         return () => {
             clearInterval(updateTimer);

@@ -64,11 +64,11 @@ export function createMunicipalityObjects(){
 			susceptible: row.bevolking,
 			infected: 0,
 			recovered: 0,
-			distanceList: getDistances(row.gemeenteCode), //Note that distances will contain itself
+			distances: getDistances(row.gemeenteCode), //Note that distances will contain itself
 		};
 
 		municipalityStats.push(stats.id);
-	})
+	});
 }
 
 function parsePolygon(polygonString) {
@@ -118,6 +118,14 @@ export function getMunicipalityStats(gemeenteCode) {
 	const id = codeToInternalId.get(gemeenteCode);
 	if (id === undefined) return null;
 	return municipalityStats[id];
+}
+
+export function getMunicipalities(){
+	return municipalityStats;
+}
+
+export function setMunicipalities(nextState){
+	municipalityStats = nextState;
 }
 
 export function codeToId(gemeenteCode) {
@@ -187,5 +195,5 @@ export function municipalityRecovered(gemeenteCode){
 }
 
 export function municipalityDistances(gemeenteCode){
-	return getMunicipalityStats(gemeenteCode)?.distanceList;
+	return getMunicipalityStats(gemeenteCode)?.distances;
 }

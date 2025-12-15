@@ -25,7 +25,7 @@ export function stepModel() {
 	const municipalities = getMunicipalities();
 	const nextState = [];
 
-	municipalities.forEach((muni, i) => {
+	municipalities.forEach((municipality, i) => {
 		// 1. Contact weights W_ij
 		const Wij = computeContactRow(i, municipalities);
 
@@ -37,18 +37,18 @@ export function stepModel() {
 		const pRec = 1 - Math.exp(-recoveryRate * deltaT);
 
 		// 4. Stochastic transitions
-		const newInfections = binomialDraw(muni.susceptible, pInf);
-		const newRecoveries = binomialDraw(muni.infected, pRec);
+		const newInfections = binomialDraw(municipality.susceptible, pInf);
+		const newRecoveries = binomialDraw(municipality.infected, pRec);
 
 		// 5. State update
 		nextState.push({
-			id: muni.id,
-			gemeenteCode: muni.gemeenteCode,
-			population: muni.population,
-			susceptible: muni.susceptible - newInfections,
-			infected: muni.infected + newInfections - newRecoveries,
-			recovered: muni.recovered + newRecoveries,
-			distances: muni.distances,
+			id: municipality.id,
+			gemeenteCode: municipality.gemeenteCode,
+			population: municipality.population,
+			susceptible: municipality.susceptible - newInfections,
+			infected: municipality.infected + newInfections - newRecoveries,
+			recovered: municipality.recovered + newRecoveries,
+			distances: municipality.distances,
 		});
 	});
 

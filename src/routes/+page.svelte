@@ -10,6 +10,9 @@
     let updateTimer;
     let drawTimer;
 
+    let currentUpdateCall = 0;
+    let currentDrawCall = 0;
+
     let population = 0;
     let infected = 0;
     let susceptible = 0;
@@ -17,14 +20,14 @@
 
     //Start function
     onMount(() => {
-        updateTimer = setInterval(update, 1000 / updateHz);
-        drawTimer = setInterval(draw, 1000 / drawHz);
-
         //Prepare all the simulation data
         load();
 
         //Run start on model
         start();
+
+        updateTimer = setInterval(update, 1000 / updateHz);
+        drawTimer = setInterval(draw, 1000 / drawHz);
 
         return () => {
             clearInterval(updateTimer);
@@ -35,6 +38,7 @@
     //Update loop, called {updateHz} times per second
     const update = () => {
         step();
+        currentUpdateCall += 1;
     };
 
     //Draw loop, called {drawHz} times per second
@@ -44,6 +48,8 @@
         susceptible = getTotalSusceptible();
         infected = getTotalInfected();
         recovered = getTotalRecovered();
+
+        currentDrawCall += 1;
     };
 </script>
 
@@ -51,4 +57,6 @@
     <h1 class="text-3xl font-bold mb-4">Ziekteverspreiding simulatie</h1>
 
     <p class="mt-4 text-lg">Population: {population}, Susceptible: {susceptible}, Infected: {infected}, Recovered: {recovered}</p>
+
+    <p class="mt-4 text-lg">Update call (simulation step): {currentUpdateCall} Draw call: {currentDrawCall}</p>
 </div>

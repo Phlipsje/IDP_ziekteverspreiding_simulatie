@@ -19,6 +19,16 @@ export function loadDatasets(){
 	const bevolkingParsed = Papa.parse(csvBevolkingText, {header: true}).data;
 	const geografieParsed = Papa.parse(csvGeografieText, {header: true,skipEmptyLines: true}).data;
 
+	//Dataset's final line might be empty, this would then remove it from the dataset
+	/*
+	if(bevolkingParsed[bevolkingParsed.length-1].Gemeente_Code === undefined){
+		bevolkingParsed.take(bevolkingParsed.length-1);
+	}
+	if(geografieParsed[geografieParsed.length-1].Gemeente_Code === undefined){
+		geografieParsed.take(geografieParsed.length-1);
+	}
+	*/
+
 	// Parse and index geometry
 	geografieParsed.forEach(row => {
 		if (!row.polygon || !row.code) return;
@@ -67,7 +77,7 @@ export function createMunicipalityObjects(){
 			distances: getDistances(row.gemeenteCode), //Note that distances will contain itself
 		};
 
-		municipalityStats.push(stats.id);
+		municipalityStats.push(stats);
 	});
 }
 
@@ -117,6 +127,9 @@ export function getMunicipalityData(gemeenteCode) {
 export function getMunicipalityStats(gemeenteCode) {
 	const id = codeToInternalId.get(gemeenteCode);
 	if (id === undefined) return null;
+	console.log(id);
+	console.log(municipalityStats[id]);
+	console.log(municipalityData[id]);
 	return municipalityStats[id];
 }
 

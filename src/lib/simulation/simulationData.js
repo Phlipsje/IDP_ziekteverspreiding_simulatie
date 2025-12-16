@@ -127,9 +127,6 @@ export function getMunicipalityData(gemeenteCode) {
 export function getMunicipalityStats(gemeenteCode) {
 	const id = codeToInternalId.get(gemeenteCode);
 	if (id === undefined) return null;
-	console.log(id);
-	console.log(municipalityStats[id]);
-	console.log(municipalityData[id]);
 	return municipalityStats[id];
 }
 

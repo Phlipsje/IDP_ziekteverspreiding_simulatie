@@ -1,6 +1,6 @@
 import {
 	municipalityCount, municipalityName, municipalityPopulation, municipalityProvince,
-	municipalityArea, municipalityCentroid, municipalityPolygon, municipalityPolygonById,
+	municipalityArea, municipalityCentroid,
 	getMunicipalities, setMunicipalities, getMunicipalityStats
 } from './simulationData.js';
 

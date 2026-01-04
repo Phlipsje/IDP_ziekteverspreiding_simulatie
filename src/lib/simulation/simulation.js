@@ -1,8 +1,15 @@
 //Entry point of simulation
 import {
-    loadDatasets, createMunicipalityObjects,
-    municipalityCount, municipalityName, municipalityPopulation, municipalityProvince,
-    municipalityArea, municipalityCentroid, municipalityPolygon, municipalityPolygonById, getMunicipalities
+    loadDatasets,
+    createMunicipalityObjects,
+    municipalityCount,
+    municipalityName,
+    municipalityPopulation,
+    municipalityProvince,
+    municipalityArea,
+    municipalityCentroid,
+    municipalityBbox,
+    getMunicipalities
 } from './simulationData.js';
 import { startModel, stepModel } from '$lib/simulation/simulationModel.js';
 
@@ -20,36 +27,32 @@ export function step(){
     stepModel();
 }
 
-export function readMunicipalityCount(){
+export function getMunicipalityCount(){
     return municipalityCount;
 }
 
-export function readMunicipalityName(gemeenteCode) {
+export function getMunicipalityName(gemeenteCode) {
     return municipalityName(gemeenteCode);
 }
 
-export function readMunicipalityPopulation(gemeenteCode) {
+export function getMunicipalityPopulation(gemeenteCode) {
     return municipalityPopulation(gemeenteCode);
 }
 
-export function readMunicipalityProvince(gemeenteCode) {
+export function getMunicipalityProvince(gemeenteCode) {
     return municipalityProvince(gemeenteCode);
 }
 
-export function readMunicipalityArea(gemeenteCode) {
+export function getMunicipalityArea(gemeenteCode) {
     return municipalityArea(gemeenteCode);
 }
 
-export function readMunicipalityCentroid(gemeenteCode) {
+export function getMunicipalityCentroid(gemeenteCode) {
     return municipalityCentroid(gemeenteCode);
 }
 
-export function readMunicipalityPolygon(gemeenteCode) {
-    return municipalityPolygon(gemeenteCode);
-}
-
-export function readMunicipalityPolygonById(id) {
-    return municipalityPolygonById(id);
+export function getMunicipalityBbox(gemeenteCode) {
+    return municipalityBbox(gemeenteCode);
 }
 
 export function getTotalPopulation(){

@@ -8,12 +8,12 @@ import csvGeografieText from '../assets/datasets/IDP-geografie-dataset.csv?raw';
 
 //Data is all the information that is loaded in
 let municipalityData = [];
+let municipalityGeography = [];
 //Stats are all the values kept track of during the simulation
 let municipalityStats = [];
 
 const codeToInternalId = new Map();
 const idToCode = new Map();
-const geometryByCode = new Map();
 
 export function loadDatasets(){
 	const bevolkingParsed = Papa.parse(csvBevolkingText, {header: true}).data;
@@ -29,20 +29,8 @@ export function loadDatasets(){
 	}
 	*/
 
-	// Parse and index geometry
-	geografieParsed.forEach(row => {
-		if (!row.polygon || !row.code) return;
-
-		geometryByCode.set(
-			row.code,
-			parsePolygon(row.polygon)
-		);
-	});
-
-	//Index municipalities
+	//Index municipalities and municipality data
 	bevolkingParsed.forEach((row, index) => {
-		const geometry = geometryByCode.get(row.Gemeente_Code);
-
 		const normalized = {
 			id: index,
 			gemeenteCode: row.Gemeente_Code,
@@ -50,18 +38,27 @@ export function loadDatasets(){
 			provincieCode: row.Provincie_Code,
 			provincieNaam: row.Provincie_Naam,
 			bevolking: Number(row.Bevolking_Aantallen),
-			zwaartepuntX: Number(row.zwaartepunt_x),
-			zwaartepuntY: Number(row.zwaartepunt_y),
-			oppervlakteM2: Number(row.oppervlakte_m2),
-
-			// Geometry
-			polygonX: geometry?.x ?? [],
-			polygonY: geometry?.y ?? [],
 		};
 
 		municipalityData.push(normalized);
 		codeToInternalId.set(normalized.gemeenteCode, index);
 		idToCode.set(index, normalized.gemeenteCode);
+	});
+
+	// Municipality geography info
+	geografieParsed.forEach((row, index) => {
+		const normalized = {
+			id: index,
+			gemeenteCode: row.Gemeente_Code,
+			gemeenteNaam: row.Gemeente_Naam,
+			zwaartepuntX: Number(row.zwaartepunt_x),
+			zwaartepuntY: Number(row.zwaartepunt_y),
+			oppervlakteM2: Number(row.oppervlakte_m2),
+			bboxWidth: Number(row.bbox_width),
+			bboxHeight: Number(row.bbox_height)
+		};
+
+		municipalityGeography.push(normalized);
 	});
 }
 
@@ -81,33 +78,13 @@ export function createMunicipalityObjects(){
 	});
 }
 
-function parsePolygon(polygonString) {
-	// Remove "POLYGON ((" prefix and "))" suffix
-	const cleaned = polygonString
-		.replace('POLYGON ((', '')
-		.replace('))', '');
-
-	const x = [];
-	const y = [];
-
-	const points = cleaned.split(',');
-
-	for (let i = 0; i < points.length; i++) {
-		const [px, py] = points[i].trim().split(/\s+/);
-		x.push(Number(px));
-		y.push(Number(py));
-	}
-
-	return { x, y };
-}
-
 //Gets the distance to all other municipalities
 //Distances will contain itself
 //Might be better to preprocess this with Python and put in dataset
 function getDistances(gemeenteCode){
 	const distances = [];
 
-	municipalityData.forEach((row, index) => {
+	municipalityGeography.forEach((row, index) => {
 		//Make numbers in KMs rounded to nearest int, we do not need extra precision
 		let x = (row.zwaartepuntX / 1000) - (municipalityCentroid(gemeenteCode).x / 1000);
 		let y = row.zwaartepuntY / 1000 - (municipalityCentroid(gemeenteCode).y / 1000);
@@ -122,6 +99,12 @@ export function getMunicipalityData(gemeenteCode) {
 	const id = codeToInternalId.get(gemeenteCode);
 	if (id === undefined) return null;
 	return municipalityData[id];
+}
+
+export function getMunicipalityGeography(gemeenteCode) {
+	const id = codeToInternalId.get(gemeenteCode);
+	if (id === undefined) return null;
+	return municipalityGeography[id];
 }
 
 export function getMunicipalityStats(gemeenteCode) {
@@ -163,33 +146,17 @@ export function municipalityProvince(gemeenteCode) {
 }
 
 export function municipalityArea(gemeenteCode) {
-	return getMunicipalityData(gemeenteCode)?.oppervlakteM2;
+	return getMunicipalityGeography(gemeenteCode)?.oppervlakteM2;
 }
 
 export function municipalityCentroid(gemeenteCode) {
-	const m = getMunicipalityData(gemeenteCode);
+	const m = getMunicipalityGeography(gemeenteCode);
 	return m ? { x: m.zwaartepuntX, y: m.zwaartepuntY } : null;
 }
 
-export function municipalityPolygon(gemeenteCode) {
-	const id = codeToInternalId.get(gemeenteCode);
-	if (id === undefined) return null;
-
-	const m = municipalityData[id];
-	return {
-		x: m.polygonX,
-		y: m.polygonY,
-	};
-}
-
-export function municipalityPolygonById(id) {
-	const m = municipalityData[id];
-	if (!m) return null;
-
-	return {
-		x: m.polygonX,
-		y: m.polygonY,
-	};
+export function municipalityBbox(gemeenteCode) {
+	const m = getMunicipalityGeography(gemeenteCode);
+	return m ? { width: m.bboxWidth, height: m.bboxHeight } : null;
 }
 
 export function municipalitySusceptible(gemeenteCode){

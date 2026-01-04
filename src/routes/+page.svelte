@@ -1,9 +1,11 @@
 <script>
     import { onMount, onDestroy } from "svelte";
     import { load, start, step,
+             getMunicipalityCentroid, getMunicipalityBbox,
              getTotalPopulation, getTotalSusceptible, getTotalInfected, getTotalRecovered
     } from '../lib/simulation/simulation.js';
 
+    //Update and draw loop
     const updateHz = 30;
     const drawHz = 20;
 
@@ -13,6 +15,23 @@
     let currentUpdateCall = 0;
     let currentDrawCall = 0;
 
+    //Drawing parameters
+    // Netherlands size in meters (for drawing coordinates)
+    const NL_width = 280000;
+    const NL_height = 350000;
+
+    const NL_rectangle = {
+        x: 0,
+        y: 0,
+        width: 800,
+        height: 600
+    };
+    let canvas;
+    let ctx;
+    let drawable;
+    let color = "#1E88E5"; //Temp fixed color
+
+    //Simulation variables (are read in, do not adjust)
     let population = 0;
     let infected = 0;
     let susceptible = 0;
@@ -27,6 +46,8 @@
     onMount(() => {
         //Prepare all the simulation data
         load();
+        ctx = canvas.getContext("2d");
+        loadMunicipalityDrawable('GM0263', NL_rectangle).then(d => drawable = d);
 
         //Run start on model
         start();
@@ -61,6 +82,7 @@
         currentDrawCall += 1;
     };
 
+    //For drawing SIR graph
     function toPolylinePoints(history, maxY, width, height) {
         if (history.length < 2 || maxY <= 0) return "";
 
@@ -73,8 +95,99 @@
           .join("\n");
     }
 
+    //For drawing municipality PNGs
+    function mapToRect(xMeters, yMeters, rect) {
+        const scaleX = rect.width / NL_width;
+        const scaleY = rect.height / NL_height;
 
+        // keep correct aspect ratio by using the smaller scale
+        const scale = Math.min(scaleX, scaleY);
+
+        return {
+            x: rect.x + xMeters * scale,
+            // invert Y so “up” in meters becomes “up” on screen
+            y: rect.y + (NL_height - yMeters) * scale,
+            scale
+        };
+    }
+
+    async function loadMunicipalityDrawable(municipalityCode, rect) {
+        // 1. centroid in meters
+        const centroid = getMunicipalityCentroid(municipalityCode);
+        const bbox = getMunicipalityBbox(municipalityCode);
+
+        // 2. image path (adjust if your directory differs)
+        const imgUrl = `src/lib/assets/datasets/municipality_pngs/${municipalityCode}.png`;
+
+        // 3. preload image
+        const img = new Image();
+        img.src = imgUrl;
+        await img.decode();
+
+        // 4. convert centroid to draw position
+        const mapped = mapToRect(centroid.x, centroid.y, rect);
+
+        let obj = {
+            code: municipalityCode,
+            centroid,
+            image: img,
+            draw: {
+                x: mapped.x,
+                y: mapped.y,
+                scale: mapped.scale,
+                width: bbox.width * mapped.scale,
+                height: bbox.height * mapped.scale
+            }
+        };
+
+        // 5. return render-ready object
+        return obj;
+    }
+
+    function clearMunicipalityDrawing() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawMunicipality(ctx, drawable, color) {
+        const { image, draw } = drawable;
+
+        console.log('drawable', drawable);
+        console.log(image);
+        console.log(draw);
+
+        clearMunicipalityDrawing();
+
+        // draw the base image
+        ctx.drawImage(
+          image,
+          draw.x - draw.width / 2,
+          draw.y - draw.height / 2,
+          draw.width,
+          draw.height
+        );
+
+        // set blend mode
+        ctx.globalCompositeOperation = "source-in";
+
+        // paint the color where pixels exist
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        // reset
+        ctx.globalCompositeOperation = "source-over";
+    }
+
+    // re-draw automatically if the color changes
+    $: if (ctx && drawable) {
+        drawMunicipality(ctx, drawable, color);
+    }
 </script>
+
+<canvas bind:this={canvas} width="800" height="600" />
+
+<button on:click={() => (color = "#E53935")}>Make red</button>
+<button on:click={() => (color = "#43A047")}>Make green</button>
+<button on:click={() => (color = "#1E88E5")}>Make blue</button>
 
 <div class="p-6 max-w-xl mx-auto">
     <h1 class="text-3xl font-bold mb-4">Ziekteverspreiding simulatie</h1>

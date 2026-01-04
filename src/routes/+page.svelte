@@ -4,6 +4,7 @@
              getMunicipalityCentroid, getMunicipalityBbox,
              getTotalPopulation, getTotalSusceptible, getTotalInfected, getTotalRecovered
     } from '../lib/simulation/simulation.js';
+    import { getMunicipalityData, getMunicipalities } from '$lib/simulation/simulationData.js';
 
     //Update and draw loop
     const updateHz = 30;
@@ -18,7 +19,7 @@
     //Drawing parameters
     // Netherlands size in meters (for drawing coordinates)
     const NL_width = 280000;
-    const NL_height = 350000;
+    const NL_height = 680000;
 
     const NL_rectangle = {
         x: 0,
@@ -29,6 +30,7 @@
     let canvas;
     let ctx;
     let drawable;
+    const rect = { x: 0, y: 0, width: 800, height: 600 };
     let color = "#1E88E5"; //Temp fixed color
 
     //Simulation variables (are read in, do not adjust)
@@ -46,8 +48,7 @@
     onMount(() => {
         //Prepare all the simulation data
         load();
-        ctx = canvas.getContext("2d");
-        loadMunicipalityDrawable('GM0263', NL_rectangle).then(d => drawable = d);
+        prepareMunicipalityDrawing();
 
         //Run start on model
         start();
@@ -148,14 +149,30 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
+    async function prepareMunicipalityDrawing(){
+        ctx = canvas.getContext("2d");
+        clearMunicipalityDrawing();
+        const municipalityList = getMunicipalities();
+
+        const drawables = await Promise.all(
+          municipalityList.map(municipality => loadMunicipalityDrawable(municipality.gemeenteCode, rect))
+        );
+
+        // draw each municipality
+        for (const drawable of drawables) {
+            drawMunicipality(ctx, drawable, color);
+        }
+
+        // then recolor all drawn pixels
+        colorize(ctx, color);
+    }
+
     function drawMunicipality(ctx, drawable, color) {
         const { image, draw } = drawable;
 
         console.log('drawable', drawable);
         console.log(image);
         console.log(draw);
-
-        clearMunicipalityDrawing();
 
         // draw the base image
         ctx.drawImage(
@@ -165,15 +182,13 @@
           draw.width,
           draw.height
         );
+    }
 
-        // set blend mode
+    // recolor everything already drawn
+    function colorize(ctx, color) {
         ctx.globalCompositeOperation = "source-in";
-
-        // paint the color where pixels exist
         ctx.fillStyle = color;
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-        // reset
         ctx.globalCompositeOperation = "source-over";
     }
 

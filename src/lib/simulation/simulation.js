@@ -12,6 +12,7 @@ import {
     getMunicipalities
 } from './simulationData.js';
 import { startModel, stepModel } from '$lib/simulation/simulationModel.js';
+import { resetStats, updateStats } from '$lib/simulation/simulationStats.js';
 
 
 export function load(){
@@ -21,10 +22,12 @@ export function load(){
 
 export function start(){
     startModel();
+    resetStats();
 }
 
 export function step(){
     stepModel();
+    updateStats();
 }
 
 export function getMunicipalityCount(){

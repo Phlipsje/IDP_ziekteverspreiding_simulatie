@@ -170,10 +170,6 @@
     function drawMunicipality(ctx, drawable, color) {
         const { image, draw } = drawable;
 
-        console.log('drawable', drawable);
-        console.log(image);
-        console.log(draw);
-
         // draw the base image
         ctx.drawImage(
           image,
@@ -199,10 +195,6 @@
 </script>
 
 <canvas bind:this={canvas} width="800" height="600" />
-
-<button on:click={() => (color = "#E53935")}>Make red</button>
-<button on:click={() => (color = "#43A047")}>Make green</button>
-<button on:click={() => (color = "#1E88E5")}>Make blue</button>
 
 <div class="p-6 max-w-xl mx-auto">
     <h1 class="text-3xl font-bold mb-4">Ziekteverspreiding simulatie</h1>

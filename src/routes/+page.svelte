@@ -18,19 +18,17 @@
 
     //Drawing parameters
     // Netherlands size in meters (for drawing coordinates)
-    const NL_width = 280000;
-    const NL_height = 680000;
+    const NL_MIN_X = 0;//482;
+    const NL_MIN_Y = 284182;
+    const NL_MAX_X = 466602;//306602;
+    const NL_MAX_Y = 637049;//637049;
+    const NL_width  = NL_MAX_X - NL_MIN_X;
+    const NL_height = NL_MAX_Y - NL_MIN_Y;
 
-    const NL_rectangle = {
-        x: 0,
-        y: 0,
-        width: 800,
-        height: 600
-    };
     let canvas;
     let ctx;
-    let drawable;
-    const rect = { x: 0, y: 0, width: 800, height: 600 };
+    let mapImage;
+    const rect = { x: 0, y: 0, width: 900, height: 600 };
     let color = "#1E88E5"; //Temp fixed color
 
     //Simulation variables (are read in, do not adjust)
@@ -46,9 +44,10 @@
 
     //Start function
     onMount(() => {
+        ctx = canvas.getContext('2d');
         //Prepare all the simulation data
         load();
-        prepareMunicipalityDrawing();
+        drawNL();
 
         //Run start on model
         start();
@@ -81,6 +80,10 @@
         historyR = [...historyR, recovered].slice(-MAX_HISTORY);
 
         currentDrawCall += 1;
+
+        clearMunicipalityDrawing();
+        drawBaseMap(mapImage, ctx, rect);
+        drawMunicipalityCircles(ctx, rect, 3);
     };
 
     //For drawing SIR graph
@@ -96,101 +99,87 @@
           .join("\n");
     }
 
-    //For drawing municipality PNGs
-    function mapToRect(xMeters, yMeters, rect) {
-        const scaleX = rect.width / NL_width;
-        const scaleY = rect.height / NL_height;
+    async function drawNL(){
+        mapImage = new Image();
+        mapImage.src = "src/lib/assets/Kaart nederland.png";
+        await mapImage.decode();
 
-        // keep correct aspect ratio by using the smaller scale
-        const scale = Math.min(scaleX, scaleY);
+        drawBaseMap(mapImage, ctx, rect);
+        drawMunicipalityCircles(ctx, rect, 3);
+    }
+
+    function drawBaseMap(mapImage, ctx, rect) {
+        ctx.drawImage(
+          mapImage,
+          rect.x,
+          rect.y,
+          rect.width,
+          rect.height
+        );
+    }
+
+    function metersToCanvas(xMeters, yMeters, rect) {
+        const base_x_offset = 200;
+        const scaleX = rect.width  / NL_width;
+        const scaleY = rect.height / NL_height;
+        const scale  = Math.min(scaleX, scaleY);
 
         return {
-            x: rect.x + xMeters * scale,
-            // invert Y so “up” in meters becomes “up” on screen
-            y: rect.y + (NL_height - yMeters) * scale,
-            scale
+            x: rect.x + base_x_offset + (xMeters - NL_MIN_X) * scale,
+            y: rect.y + (NL_MAX_Y - yMeters) * scale
         };
     }
 
-    async function loadMunicipalityDrawable(municipalityCode, rect) {
-        // 1. centroid in meters
-        const centroid = getMunicipalityCentroid(municipalityCode);
-        const bbox = getMunicipalityBbox(municipalityCode);
+    //Get color for circle based on how many infected
+    function valueToColor(value) {
+        const v = Math.max(0, Math.min(1, value)); // clamp
+        const COLOR_STOPS = [
+            { v: 0.00, r:   0, g: 176, b:  80 }, // green
+            { v: 0.10, r: 255, g: 235, b:  59 }, // yellow
+            { v: 0.25, r: 244, g:  67, b:  54 }, // red
+            { v: 0.40, r: 183, g:  28, b:  28 }  // dark red
+        ];
 
-        // 2. image path (adjust if your directory differs)
-        const imgUrl = `src/lib/assets/datasets/municipality_pngs/${municipalityCode}.png`;
+        for (let i = 0; i < COLOR_STOPS.length - 1; i++) {
+            const a = COLOR_STOPS[i];
+            const b = COLOR_STOPS[i + 1];
 
-        // 3. preload image
-        const img = new Image();
-        img.src = imgUrl;
-        await img.decode();
+            if (v >= a.v && v <= b.v) {
+                const t = (v - a.v) / (b.v - a.v);
 
-        // 4. convert centroid to draw position
-        const mapped = mapToRect(centroid.x, centroid.y, rect);
+                const r = Math.round(a.r + (b.r - a.r) * t);
+                const g = Math.round(a.g + (b.g - a.g) * t);
+                const bcol = Math.round(a.b + (b.b - a.b) * t);
 
-        let obj = {
-            code: municipalityCode,
-            centroid,
-            image: img,
-            draw: {
-                x: mapped.x,
-                y: mapped.y,
-                scale: mapped.scale,
-                width: bbox.width * mapped.scale,
-                height: bbox.height * mapped.scale
+                return `rgb(${r}, ${g}, ${bcol})`;
             }
-        };
+        }
 
-        // 5. return render-ready object
-        return obj;
+        // v >= last stop (0.40+)
+        const last = COLOR_STOPS[COLOR_STOPS.length - 1];
+        return `rgb(${last.r}, ${last.g}, ${last.b})`;
+    }
+
+
+    function drawMunicipalityCircles(ctx, rect, radius = 3) {
+        ctx.save();
+        const municipalityList = getMunicipalities();
+
+        for (const municipality of municipalityList) {
+            const centroid = getMunicipalityCentroid(municipality.gemeenteCode);
+            const { x, y } = metersToCanvas(centroid.x, centroid.y, rect);
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = valueToColor(municipality.infected / municipality.population);
+            ctx.fill();
+        }
+
+        ctx.restore();
     }
 
     function clearMunicipalityDrawing() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    async function prepareMunicipalityDrawing(){
-        ctx = canvas.getContext("2d");
-        clearMunicipalityDrawing();
-        const municipalityList = getMunicipalities();
-
-        const drawables = await Promise.all(
-          municipalityList.map(municipality => loadMunicipalityDrawable(municipality.gemeenteCode, rect))
-        );
-
-        // draw each municipality
-        for (const drawable of drawables) {
-            drawMunicipality(ctx, drawable, color);
-        }
-
-        // then recolor all drawn pixels
-        colorize(ctx, color);
-    }
-
-    function drawMunicipality(ctx, drawable, color) {
-        const { image, draw } = drawable;
-
-        // draw the base image
-        ctx.drawImage(
-          image,
-          draw.x - draw.width / 2,
-          draw.y - draw.height / 2,
-          draw.width,
-          draw.height
-        );
-    }
-
-    // recolor everything already drawn
-    function colorize(ctx, color) {
-        ctx.globalCompositeOperation = "source-in";
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.globalCompositeOperation = "source-over";
-    }
-
-    // re-draw automatically if the color changes
-    $: if (ctx && drawable) {
-        drawMunicipality(ctx, drawable, color);
     }
 </script>
 

@@ -29,7 +29,6 @@
     let ctx;
     let mapImage;
     const rect = { x: 0, y: 0, width: 900, height: 600 };
-    let color = "#1E88E5"; //Temp fixed color
 
     //Simulation variables (are read in, do not adjust)
     let population = 0;

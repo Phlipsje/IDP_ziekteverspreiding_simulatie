@@ -8,6 +8,50 @@
 	import BackwardImage from '$lib/assets/backward.png';
 	import playImage from '$lib/assets/play.png';
 	import forwardImage from '$lib/assets/forward.png';
+
+	import Map from '$lib/components/map.svelte';
+	import SirGraph from '$lib/components/sirGraph.svelte';
+
+	//Simulation
+	import { onMount } from "svelte";
+	import { load, start, step } from '$lib/simulation/simulation.js';
+	import { getStats } from '$lib/simulation/simulationStats';
+
+	//Update and draw loop
+	const updateHz = 20;
+	const drawHz = 10;
+
+	let updateTimer;
+	let drawTimer;
+
+	//Use these in reactive updates to decide when UI components should be redrawn
+	let currentUpdateCall = 0;
+	let currentDrawCall = 0;
+
+	//Start function
+	onMount(() => {
+		//Prepare all the simulation data
+		load();
+
+		//Run start on model
+		start();
+
+		updateTimer = setInterval(update, 1000 / updateHz);
+		drawTimer = setInterval(draw, 1000 / drawHz);
+
+		return () => {
+			clearInterval(updateTimer);
+		};
+	});
+
+	const update = () => {
+		step();
+		currentUpdateCall += 1;
+	};
+
+	const draw = () => {
+		currentDrawCall += 1;
+	}
 </script>
 
 <div class="flex w-full h-full p-5 flex-col items-start gap-4 h-screen">
@@ -49,6 +93,12 @@
 					class="flex flex-col items-start w-[398px] h-full p-1 bg-white border rounded-[5px] border-[#A3A3A3]"
 				>
 					<!-- Here goes country graph code -->
+					<SirGraph
+						width={300}
+						height={250}
+						windowSize={60}
+						refreshCycle={currentDrawCall}
+						/>
 				</div>
 			</div>
 
@@ -74,6 +124,11 @@
 					class="flex h-[600px] flex-col items-start flex-1 border rounded-[5px] border-[#A3A3A3] bg-[#EEE] h-full"
 				>
 					<!-- Netherlands visualization -->
+					<Map
+						width={750}
+						height={500}
+						refreshCycle={currentDrawCall}
+					/>
 				</div>
 				<div class="flex flex-col gap-2 h-full">
 					<div

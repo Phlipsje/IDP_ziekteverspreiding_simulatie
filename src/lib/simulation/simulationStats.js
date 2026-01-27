@@ -83,5 +83,6 @@ export function getStatsInRange(start, end){
 }
 
 export function getMostRecentStats(days){
-	return getStatsInRange(currentDay-days, currentDay);
+	let begin = Math.max(0, currentDay-days);
+	return getStatsInRange(begin, currentDay);
 }

@@ -71,6 +71,8 @@ export function createMunicipalityObjects(){
 			susceptible: row.bevolking,
 			infected: 0,
 			recovered: 0,
+			vaccinated: 0,
+			deaths: 0,
 			distances: getDistances(row.gemeenteCode), //Note that distances will contain itself
 		};
 

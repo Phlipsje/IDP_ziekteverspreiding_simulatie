@@ -15,6 +15,10 @@ let municipalityStats = [];
 const codeToInternalId = new Map();
 const idToCode = new Map();
 
+const AGE_GROUPS = 3;
+//Temp until we have it in dataset
+const ageDistribution = [0.2, 0.5, 0.3]; // 0–17, 18–65, 65+
+
 export function loadDatasets(){
 	const bevolkingParsed = Papa.parse(csvBevolkingText, {header: true}).data;
 	const geografieParsed = Papa.parse(csvGeografieText, {header: true,skipEmptyLines: true}).data;
@@ -64,17 +68,30 @@ export function loadDatasets(){
 
 export function createMunicipalityObjects(){
 	municipalityData.forEach((row, index) => {
+
 		const stats = {
 			id: index,
 			gemeenteCode: row.gemeenteCode,
-			population: row.bevolking,
-			susceptible: row.bevolking,
-			infected: 0,
-			recovered: 0,
-			vaccinated: 0,
-			deaths: 0,
+			population: Array(AGE_GROUPS),
+			susceptible: Array(AGE_GROUPS),
+			infected: Array(AGE_GROUPS),
+			recovered: Array(AGE_GROUPS),
+			vaccinated: Array(AGE_GROUPS),
+			deaths: Array(AGE_GROUPS),
 			distances: getDistances(row.gemeenteCode), //Note that distances will contain itself
+			contactRow: Array(municipalityData.length), //One entry per municipality, pre-made to avoid repeated allocations
 		};
+
+		for (let a = 0; a < AGE_GROUPS; a++) {
+			const groupPop = Math.floor(row.bevolking * ageDistribution[a]);
+
+			stats.population[a] = groupPop;
+			stats.susceptible[a] = groupPop;
+			stats.infected[a] = 0;
+			stats.recovered[a] = 0;
+			stats.vaccinated[a] = 0;
+			stats.deaths[a] = 0;
+		}
 
 		municipalityStats.push(stats);
 	});
@@ -161,6 +178,7 @@ export function municipalityBbox(gemeenteCode) {
 	return m ? { width: m.bboxWidth, height: m.bboxHeight } : null;
 }
 
+/* TEMP not working
 export function municipalitySusceptible(gemeenteCode){
 	return getMunicipalityStats(gemeenteCode)?.susceptible;
 }
@@ -172,6 +190,7 @@ export function municipalityInfected(gemeenteCode){
 export function municipalityRecovered(gemeenteCode){
 	return getMunicipalityStats(gemeenteCode)?.recovered;
 }
+ */
 
 export function municipalityDistances(gemeenteCode){
 	return getMunicipalityStats(gemeenteCode)?.distances;

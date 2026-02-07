@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getMunicipalityCentroid } from '$lib/simulation/simulation.js';
-	import { getMunicipalities } from '$lib/simulation/simulationData.js';
+	import { getMunicipalities, municipalityInfected, municipalityPopulation } from '$lib/simulation/simulationData.js';
 
 	/* =====================
 	   Public component API
@@ -136,7 +136,7 @@
 			ctx.beginPath();
 			ctx.arc(x, y, radius, 0, Math.PI * 2);
 			ctx.fillStyle = valueToColor(
-				municipality.infected / municipality.population
+				municipalityInfected(municipality.gemeenteCode) / municipalityPopulation(municipality.gemeenteCode)
 			);
 			ctx.fill();
 		}

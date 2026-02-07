@@ -178,19 +178,30 @@ export function municipalityBbox(gemeenteCode) {
 	return m ? { width: m.bboxWidth, height: m.bboxHeight } : null;
 }
 
-/* TEMP not working
 export function municipalitySusceptible(gemeenteCode){
-	return getMunicipalityStats(gemeenteCode)?.susceptible;
+	const municipality = getMunicipalityStats(gemeenteCode);
+	return municipality.susceptible[0] + municipality.susceptible[1] + municipality.susceptible[2];
 }
 
 export function municipalityInfected(gemeenteCode){
-	return getMunicipalityStats(gemeenteCode)?.infected;
+	const municipality = getMunicipalityStats(gemeenteCode);
+	return municipality.infected[0] + municipality.infected[1] + municipality.infected[2];
 }
 
 export function municipalityRecovered(gemeenteCode){
-	return getMunicipalityStats(gemeenteCode)?.recovered;
+	const municipality = getMunicipalityStats(gemeenteCode);
+	return municipality.recovered[0] + municipality.recovered[1] + municipality.recovered[2];
 }
- */
+
+export function municipalityVaccinated(gemeenteCode){
+	const municipality = getMunicipalityStats(gemeenteCode);
+	return municipality.vaccinated[0] + municipality.vaccinated[1] + municipality.vaccinated[2];
+}
+
+export function municipalityDeaths(gemeenteCode){
+	const municipality = getMunicipalityStats(gemeenteCode);
+	return municipality.deaths[0] + municipality.deaths[1] + municipality.deaths[2];
+}
 
 export function municipalityDistances(gemeenteCode){
 	return getMunicipalityStats(gemeenteCode)?.distances;

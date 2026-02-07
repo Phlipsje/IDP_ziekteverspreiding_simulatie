@@ -18,6 +18,7 @@
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
 	let mapImage: HTMLImageElement;
+	let circleHitMap = []; //For checking clicks on circles
 
 	const rect = { x: 0, y: 0, width, height };
 
@@ -39,6 +40,7 @@
 
 	onMount(async () => {
 		ctx = canvas.getContext('2d')!;
+		canvas.addEventListener("click", onCanvasClick);
 		await drawNL();
 	});
 
@@ -127,6 +129,8 @@
 	function drawMunicipalityCircles(radius = 3) {
 		ctx.save();
 
+		circleHitMap.length = 0; // reset per frame
+
 		const municipalityList = getMunicipalities();
 
 		for (const municipality of municipalityList) {
@@ -136,13 +140,41 @@
 			ctx.beginPath();
 			ctx.arc(x, y, radius, 0, Math.PI * 2);
 			ctx.fillStyle = valueToColor(
-				municipalityInfected(municipality.gemeenteCode) / municipalityPopulation(municipality.gemeenteCode)
+				municipalityInfected(municipality.gemeenteCode) /
+				municipalityPopulation(municipality.gemeenteCode)
 			);
 			ctx.fill();
+
+			// Register for hit detection
+			circleHitMap.push({
+				x,
+				y,
+				radius,
+				gemeenteCode: municipality.gemeenteCode
+			});
 		}
 
 		ctx.restore();
 	}
+
+	//Detect if mouse pressed so that we can do something to municipality circles
+	function onCanvasClick(event) {
+		const rect = canvas.getBoundingClientRect();
+
+		const mouseX = event.clientX - rect.left;
+		const mouseY = event.clientY - rect.top;
+
+		for (const circle of circleHitMap) {
+			const dx = mouseX - circle.x;
+			const dy = mouseY - circle.y;
+
+			if (dx * dx + dy * dy <= circle.radius * circle.radius) {
+				console.log("Clicked:", circle.gemeenteCode);
+				return;
+			}
+		}
+	}
+
 </script>
 
 <canvas

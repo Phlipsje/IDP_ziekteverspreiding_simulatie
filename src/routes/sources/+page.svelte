@@ -26,32 +26,39 @@
 		</div>
 	</div>
 
-	<!-- PDF Section -->
-	<section>
-		<h2 class="text-xl font-semibold mb-3">Theory</h2>
-		<ul class="list-disc ml-6 space-y-2">
-			{#each pdfLinks as paper}
-				<li>
-					<a
-						href={paper.url}
-						target="_blank"
-						class="text-blue-600 underline"
-					>
-						{paper.title}
-					</a>
-				</li>
-			{/each}
-		</ul>
-	</section>
+	<!-- Centered content area -->
+	<div class="flex-1 w-full flex justify-center items-start mt-8">
+		<div class="w-full max-w-3xl space-y-12 text-center">
 
-	<!-- Written References Section -->
-	<section>
-		<h2 class="text-xl font-semibold mb-3">References</h2>
+			<!-- PDF Section -->
+			<section>
+				<h2 class="text-2xl font-semibold mb-4">Theory</h2>
+				<ul class="space-y-2">
+					{#each pdfLinks as paper}
+						<li>
+							<a
+								href={paper.url}
+								target="_blank"
+								class="text-blue-600 underline"
+							>
+								{paper.title}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</section>
 
-		<ul class="space-y-4">
-			<li>
-				<strong>Example reference</strong> — Bla bla text
-			</li>
-		</ul>
-	</section>
+			<!-- Written References Section -->
+			<section>
+				<h2 class="text-2xl font-semibold mb-4">References</h2>
+
+				<ul class="space-y-4">
+					<li>
+						<strong>Example reference</strong> — Bla bla text
+					</li>
+				</ul>
+			</section>
+
+		</div>
+	</div>
 </div>

@@ -8,6 +8,8 @@
 		susceptible: number;
 		infected: number;
 		recovered: number;
+		vaccinated: number;
+		deaths: number;
 	}[] = [];
 
 	// ---- Config ----
@@ -19,10 +21,9 @@
 	let pointsS = "";
 	let pointsI = "";
 	let pointsR = "";
+	let pointsV = "";
+	let pointsD = "";
 	let population = 0;
-	let susceptible = 0;
-	let infected = 0;
-	let recovered = 0;
 
 	function toPolylinePoints(focus: string, maxY: number, width: number, height: number): string {
 		if (snapshots.length < 2 || maxY <= 0) return "";
@@ -43,6 +44,10 @@
 					realValue = value.infected;
 				if(focus==="recovered")
 					realValue = value.recovered;
+				if(focus==="vaccinated")
+					realValue = value.vaccinated;
+				if(focus==="deaths")
+					realValue = value.deaths;
 				const x = Math.round((i / n) * width);
 				const y = Math.round(height - (realValue / maxY) * height);
 				return `${x},${y}`;
@@ -62,10 +67,9 @@
 			pointsS = toPolylinePoints("susceptible", population, width, height);
 			pointsI = toPolylinePoints("infected",    population, width, height);
 			pointsR = toPolylinePoints("recovered",   population, width, height);
+			pointsV = toPolylinePoints("vaccinated",  population, width, height);
+			pointsD = toPolylinePoints("deaths",      population, width, height);
 			population = snapshots[snapshots.length - 1].population;
-			susceptible = snapshots[snapshots.length - 1].susceptible;
-			infected = snapshots[snapshots.length - 1].infected;
-			recovered = snapshots[snapshots.length - 1].recovered;
 		}
 	}
 </script>
@@ -99,18 +103,29 @@
 			stroke-width="2"
 			points={pointsR}
 		/>
+
+		<!-- Vaccinated -->
+		<polyline
+			fill="none"
+			stroke="yellow"
+			stroke-width="2"
+			points={pointsV}
+		/>
+
+		<!-- Deaths -->
+		<polyline
+			fill="none"
+			stroke="black"
+			stroke-width="2"
+			points={pointsD}
+		/>
 	</svg>
 
 	<div class="flex gap-4 mt-2 text-sm">
 		<span class="text-blue-600">Susceptible</span>
 		<span class="text-red-600">Infected</span>
 		<span class="text-green-600">Recovered</span>
+		<span class="text-yellow-600">Vaccinated</span>
+		<span class="text-black-600">Deaths</span>
 	</div>
-
-	<p class="mt-4 text-lg">
-		Population: {population},
-		Susceptible: {susceptible},
-		Infected: {infected},
-		Recovered: {recovered}
-	</p>
 </div>

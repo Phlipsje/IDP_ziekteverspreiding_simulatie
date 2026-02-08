@@ -3,7 +3,8 @@
 ///Can then later be used to retrieve data needed to draw
 ///--------------------
 
-import { getTotalPopulation, getTotalSusceptible, getTotalInfected, getTotalRecovered
+import {
+	getTotalPopulation, getTotalSusceptible, getTotalInfected, getTotalRecovered, getTotalVaccinated, getTotalDeaths
 } from './simulation.js';
 
 const startDate = new Date("2025-01-01");
@@ -53,7 +54,8 @@ export function updateStats(){
 		susceptible: getTotalSusceptible(),
 		infected: getTotalInfected(),
 		recovered: getTotalRecovered(),
-		//Add more stats as they become relevant
+		vaccinated: getTotalVaccinated(),
+		deaths: getTotalDeaths(),
 	}
 	snapshots.push(snapshot);
 }

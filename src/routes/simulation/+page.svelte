@@ -178,7 +178,10 @@
 					class="flex flex-col items-start w-[398px] h-full p-1 bg-white border rounded-[5px] border-[#A3A3A3]"
 				>
 					<!-- Selected municipality data -->
-					<SelectedMunicipality municipality={selectedMuncipality.code} />
+					<SelectedMunicipality
+						municipality={selectedMuncipality.code}
+						refreshCycle={currentDrawCall}
+					/>
 				</div>
 			</div>
 		</div>

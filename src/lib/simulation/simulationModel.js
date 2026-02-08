@@ -4,16 +4,16 @@ import {
 	getMunicipalities, setMunicipalities, getMunicipalityStats
 } from './simulationData.js';
 
-const transmissionRate = 0.25;
+const transmissionRate = 0.42; //R0 / recovery time (5.88 / 14)
 const dt = 1.0; //One day per tick
 const contactScaling = 1.3; //Exponent for how many more contacts for bigger municipalities
-const travelFactor = 0.3; //Fraction of population of municipality that travels to every other municipality
+const travelFactor = 0.7; //Fraction of population of municipality that travels to every other municipality
 const distanceDecay = 0.9; //travelFactor*(KMs_distance)^this is the effect of distance
-const recoveryRate = [0.12, 0.1, 0.08]; // 0–17, 18–65, 65+
-const waningRecoveryRate = [0.0, 0.0, 0.0]; // 0–17, 18–65, 65+
-const vaccinationRate = [0.0, 0.0, 0.0]; // 0–17, 18–65, 65+
-const waningVaccinationRate = [0.0, 0.0, 0.0]; // 0–17, 18–65, 65+
-const mortalityRate = [0.0001, 0.001, 0.01]; // 0–17, 18–65, 65+
+const recoveryRate = [0.12, 0.07, 0.04]; // 0–17, 18–65, 65+ (inverse of recovery time)
+const waningRecoveryRate = [0.0001, 0.0001, 0.0001]; // 0–17, 18–65, 65+
+const vaccinationRate = [0.3, 0.6, 0.45]; // 0–17, 18–65, 65+ (average amount of vaccines per day, divide by 2 for needing about 2 vaccines)
+const waningVaccinationRate = [0.05, 0.05, 0.05]; // 0–17, 18–65, 65+
+const mortalityRate = [7, 7, 12]; // 0–17, 18–65, 65+
 const d0 = 0.000001; //Miniscule value to not get divide by 0's
 // How age groups mix with each other (rows sum to 1)
 const AGE_GROUPS = 3;

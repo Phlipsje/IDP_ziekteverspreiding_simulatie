@@ -11,6 +11,7 @@
 
 	import Map from '$lib/components/map.svelte';
 	import SirGraph from '$lib/components/sirGraph.svelte';
+	import SelectedMunicipality from '$lib/components/selectedMunicipality.svelte';
 
 	//Simulation
 	import { onMount } from "svelte";
@@ -58,21 +59,21 @@
 
 	// Disease select
 	let showDiseasePopup = false;
-	let selectedDisease = { naam: "Covid-26", type: "Virus" };
+	let selectedDisease = { naam: "Covid-26", code: "COVID", type: "Virus" };
 	function openDiseasePopup() {showDiseasePopup = true;}
 	function closeDiseasePopup() {showDiseasePopup = false;}
 	function handleDiseaseSelect(e) {selectedDisease = e.detail;closeDiseasePopup();}
 
 	// Graph select
 	let showGraphPopup = false;
-	let selectedGraph = { naam: "Nederland", type: "Land" };
+	let selectedGraph = { naam: "Nederland", code: "NL", type: "Land" };
 	function openGraphPopup() {showGraphPopup = true;}
 	function closeGraphPopup() {showGraphPopup = false;}
 	function handleGraphSelect(e) {selectedGraph = e.detail;closeGraphPopup();}
 
 	// Muncipality select
 	let showMuncipalityPopup = false;
-	let selectedMuncipality = { naam: "Nederland", type: "Land" };
+	let selectedMuncipality = { naam: "Nederland", code: "NL", type: "Land" };
 	function openMuncipalityPopup() {showMuncipalityPopup = true;}
 	function closeMuncipalityPopup() {showMuncipalityPopup = false;}
 	function handleMuncipalitySelect(e) {selectedMuncipality = e.detail;closeMuncipalityPopup();}
@@ -86,18 +87,18 @@
 
 
 	const diseases = [
-		{ naam: "Covid-19", type: "Virus" },
-		{ naam: "Ebola", type: "Virus" }
+		{ naam: "Covid-19", code: "COVID", type: "Virus" },
+		{ naam: "Ebola", code: "EBOLA", type: "Virus" }
 	];
 
 	const graphs = [
-		{ naam: "Nederland", type: "Land" },
-		{ naam: "Utrecht", type: "Gemeente" }
+		{ naam: "Nederland", code: "NL", type: "Land" },
+		{ naam: "Utrecht", code: "GM0344", type: "Gemeente" }
 	];
 
 	const municipality = [
-		{ naam: "Nederland", type: "Land" },
-		{ naam: "Utrecht", type: "Gemeente" }
+		{ naam: "Nederland", code: "NL", type: "Land" },
+		{ naam: "Utrecht", code: "GM0344", type: "Gemeente" }
 	];
 
 	const configure = [
@@ -106,6 +107,7 @@
 	];
 
 	import { createEventDispatcher } from 'svelte';
+	import selectedMunicipality from '$lib/components/selectedMunicipality.svelte';
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -176,6 +178,7 @@
 					class="flex flex-col items-start w-[398px] h-full p-1 bg-white border rounded-[5px] border-[#A3A3A3]"
 				>
 					<!-- Selected municipality data -->
+					<SelectedMunicipality municipality={selectedMuncipality.code} />
 				</div>
 			</div>
 		</div>

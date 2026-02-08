@@ -5,6 +5,7 @@
 
 	export type Entry = {
 		naam: string;
+		code: string; //Code represents internal data to know what we are selecting (like municipality code for example)
 		type: string;
 	};
 

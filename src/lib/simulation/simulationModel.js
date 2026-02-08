@@ -106,7 +106,7 @@ function computeContactRow(i, municipalities) {
 			Math.pow(mj.population[0]+mj.population[1]+mj.population[2], contactScaling) /
 			Math.pow(dij + d0, distanceDecay);
 
-		municipalities[i].contactRow[j] = value;
+		municipalities[i].contactRow[j] = value * travelFactor;
 		sumRaw += value;
 	});
 

@@ -93,3 +93,21 @@ export function getTotalRecovered(){
     });
     return value;
 }
+
+export function getTotalVaccinated(){
+    let value = 0;
+    getMunicipalities().forEach((municipality) => {
+        //Sum
+        value += municipality.vaccinated[0] + municipality.vaccinated[1] + municipality.vaccinated[2];
+    });
+    return value;
+}
+
+export function getTotalDeaths(){
+    let value = 0;
+    getMunicipalities().forEach((municipality) => {
+        //Sum
+        value += municipality.deaths[0] + municipality.deaths[1] + municipality.deaths[2];
+    });
+    return value;
+}

@@ -52,6 +52,61 @@
 	const draw = () => {
 		currentDrawCall += 1;
 	}
+
+
+	import PopUpList from "$lib/components/popUpList.svelte";
+
+	// Disease select
+	let showDiseasePopup = false;
+	let selectedDisease = { naam: "Covid-26", type: "Virus" };
+	function openDiseasePopup() {showDiseasePopup = true;}
+	function closeDiseasePopup() {showDiseasePopup = false;}
+	function handleDiseaseSelect(e) {selectedDisease = e.detail;closeDiseasePopup();}
+
+	// Graph select
+	let showGraphPopup = false;
+	let selectedGraph = { naam: "Nederland", type: "Land" };
+	function openGraphPopup() {showGraphPopup = true;}
+	function closeGraphPopup() {showGraphPopup = false;}
+	function handleGraphSelect(e) {selectedGraph = e.detail;closeGraphPopup();}
+
+	// Muncipality select
+	let showMuncipalityPopup = false;
+	let selectedMuncipality = { naam: "Nederland", type: "Land" };
+	function openMuncipalityPopup() {showMuncipalityPopup = true;}
+	function closeMuncipalityPopup() {showMuncipalityPopup = false;}
+	function handleMuncipalitySelect(e) {selectedMuncipality = e.detail;closeMuncipalityPopup();}
+
+	// Configuration select
+	let showConfigurePopup = false;
+	let selectedConfigure = { naam: "Pandemic", snelheid: "0.5", type: "lockdown" };
+	function openConfigurePopup() {showConfigurePopup = true;}
+	function closeConfigurePopup() {showConfigurePopup = false;}
+	function handleConfigureSelect(e) {selectedConfigure = e.detail;closeConfigurePopup();}
+
+
+	const diseases = [
+		{ naam: "Covid-19", type: "Virus" },
+		{ naam: "Ebola", type: "Virus" }
+	];
+
+	const graphs = [
+		{ naam: "Nederland", type: "Land" },
+		{ naam: "Utrecht", type: "Gemeente" }
+	];
+
+	const municipality = [
+		{ naam: "Nederland", type: "Land" },
+		{ naam: "Utrecht", type: "Gemeente" }
+	];
+
+	const configure = [
+		{ naam: "Pandemic", snelheid: "0.5", type: "lockdown" },
+		{ naam: "Upcoming disease", snelheid: "0.15", type: "lockdown" }
+	];
+
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 </script>
 
 <div class="flex w-full h-full p-5 flex-col items-start gap-4 h-screen">
@@ -81,12 +136,12 @@
 				<div class="flex">
 					<TabHeaderButton
 						labelNormal="Selected: "
-						labelBold="Country graph"
+						labelBold={selectedGraph.naam}
 						showButton={true}
 						buttonText="Change"
 						buttonBgColor="#827E9A"
 						buttonTextColor="#FFF"
-						onButtonClick={() => console.log('Button clicked')}
+						onButtonClick={openGraphPopup}
 					/>
 				</div>
 				<div
@@ -107,8 +162,16 @@
 				class="flex flex-col items-start p-2 gap-2 h-full rounded-[5px] border border-[#A3A3A3] bg-[#EEE]"
 			>
 				<div class="flex">
-					<TabHeaderButton labelNormal="Selected: " labelBold="Utrecht" showButton={false} />
-				</div>
+						<TabHeaderButton
+							labelNormal="Selected: "
+							labelBold={selectedMuncipality.naam}
+							showButton={true}
+							buttonText="Change"
+							buttonBgColor="#827E9A"
+							buttonTextColor="#FFF"
+							onButtonClick={openMuncipalityPopup}
+						/>
+					</div>
 				<div
 					class="flex flex-col items-start w-[398px] h-full p-1 bg-white border rounded-[5px] border-[#A3A3A3]"
 				>
@@ -134,17 +197,19 @@
 					<div
 						class="flex flex-col h-full items-start p-2 gap-2 rounded-[5px] border border-[#A3A3A3] bg-[#EEE] h-full"
 					>
-						<div class="flex">
+					<div class="flex">
 							<TabHeaderButton
 								labelNormal="Selected: "
-								labelBold="Covid-26"
+								labelBold={selectedDisease.naam}
 								showButton={true}
 								buttonText="Change"
 								buttonBgColor="#827E9A"
 								buttonTextColor="#FFF"
-								onButtonClick={() => console.log('Button clicked')}
+								onButtonClick={openDiseasePopup}
 							/>
 						</div>
+
+						
 						<div
 							class="flex flex-col items-start w-[398px] self-stretch p-1 bg-white border rounded-[5px] border-[#A3A3A3] h-full"
 						>
@@ -154,11 +219,15 @@
 					<div
 						class="flex flex-col h-full items-start p-2 gap-2 rounded-[5px] border border-[#A3A3A3] bg-[#EEE] h-full"
 					>
-						<div class="flex">
+					<div class="flex">
 							<TabHeaderButton
-								labelNormal="Disease configuration"
-								labelBold=""
-								showButton={false}
+								labelNormal="Selected: "
+								labelBold={selectedConfigure.naam}
+								showButton={true}
+								buttonText="Change"
+								buttonBgColor="#827E9A"
+								buttonTextColor="#FFF"
+								onButtonClick={openConfigurePopup}
 							/>
 						</div>
 						<div
@@ -234,3 +303,60 @@
 		</div>
 	</div>
 </div>
+
+{#if showDiseasePopup}
+	<div class="fixed inset-0 z-[9999]">
+		<div class="absolute inset-0 bg-black/40"></div>
+
+		<div class="absolute inset-0 flex items-center justify-center">
+			<PopUpList
+				entries={diseases}
+				on:close={closeDiseasePopup}
+				on:select={handleDiseaseSelect}
+			/>
+		</div>
+	</div>
+{/if}
+
+{#if showGraphPopup}
+	<div class="fixed inset-0 z-[9999]">
+		<div class="absolute inset-0 bg-black/40"></div>
+
+		<div class="absolute inset-0 flex items-center justify-center">
+			<PopUpList
+				entries={graphs}
+				on:close={closeGraphPopup}
+				on:select={handleGraphSelect}
+			/>
+		</div>
+	</div>
+{/if}
+
+{#if showMuncipalityPopup}
+	<div class="fixed inset-0 z-[9999]">
+		<div class="absolute inset-0 bg-black/40"></div>
+
+		<div class="absolute inset-0 flex items-center justify-center">
+			<PopUpList
+				entries={municipality}
+				on:close={closeMuncipalityPopup}
+				on:select={handleMuncipalitySelect}
+			/>
+		</div>
+	</div>
+{/if}
+
+{#if showConfigurePopup}
+	<div class="fixed inset-0 z-[9999]">
+		<div class="absolute inset-0 bg-black/40"></div>
+
+		<div class="absolute inset-0 flex items-center justify-center">
+			<PopUpList
+				entries={configure}
+				on:close={closeConfigurePopup}
+				on:select={handleConfigureSelect}
+			/>
+		</div>
+	</div>
+{/if}
+

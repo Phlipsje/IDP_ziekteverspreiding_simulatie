@@ -25,7 +25,7 @@
 			text={buttonText}
 			bgColor={buttonBgColor}
 			textColor={buttonTextColor}
-			onClick={onButtonClick}
+			on:click={onButtonClick}
 		/>
 	{/if}
 </div>

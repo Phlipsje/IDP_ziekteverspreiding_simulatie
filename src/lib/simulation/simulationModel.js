@@ -11,9 +11,9 @@ const travelFactor = 0.7; //Fraction of population of municipality that travels 
 const distanceDecay = 0.9; //travelFactor*(KMs_distance)^this is the effect of distance
 const recoveryRate = [0.12, 0.07, 0.04]; // 0–17, 18–65, 65+ (inverse of recovery time)
 const waningRecoveryRate = [0.0001, 0.0001, 0.0001]; // 0–17, 18–65, 65+
-const vaccinationRate = [0.3, 0.6, 0.45]; // 0–17, 18–65, 65+ (average amount of vaccines per day, divide by 2 for needing about 2 vaccines)
-const waningVaccinationRate = [0.05, 0.05, 0.05]; // 0–17, 18–65, 65+
-const mortalityRate = [7, 7, 12]; // 0–17, 18–65, 65+
+const vaccinationRate = [0.001, 0.001, 0.001]; // 0–17, 18–65, 65+ (average amount of vaccines per day, divide by 2 for needing about 2 vaccines)
+const waningVaccinationRate = [0.0001, 0.00001, 0.00001]; // 0–17, 18–65, 65+
+const mortalityRate = [0.00005, 0.00005, 0.00015]; // 0–17, 18–65, 65+
 const d0 = 0.000001; //Miniscule value to not get divide by 0's
 // How age groups mix with each other (rows sum to 1)
 const AGE_GROUPS = 3;

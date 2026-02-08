@@ -24,6 +24,7 @@
 	let pointsV = "";
 	let pointsD = "";
 	let population = 0;
+	let day = 0;
 
 	function toPolylinePoints(focus: string, maxY: number, width: number, height: number): string {
 		if (snapshots.length < 2 || maxY <= 0) return "";
@@ -70,6 +71,7 @@
 			pointsV = toPolylinePoints("vaccinated",  population, width, height);
 			pointsD = toPolylinePoints("deaths",      population, width, height);
 			population = snapshots[snapshots.length - 1].population;
+			day = snapshots[snapshots.length - 1].day;
 		}
 	}
 </script>
@@ -128,4 +130,5 @@
 		<span class="text-yellow-600">Vaccinated</span>
 		<span class="text-black-600">Deaths</span>
 	</div>
+	<p>Day: {day}</p>
 </div>

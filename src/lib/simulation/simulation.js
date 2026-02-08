@@ -61,7 +61,8 @@ export function getMunicipalityBbox(gemeenteCode) {
 export function getTotalPopulation(){
     let value = 0;
     getMunicipalities().forEach((municipality) => {
-        value += municipality.population;
+        //Sum
+        value += municipality.population[0] + municipality.population[1] + municipality.population[2];
     });
     return value;
 }
@@ -69,7 +70,8 @@ export function getTotalPopulation(){
 export function getTotalSusceptible(){
     let value = 0;
     getMunicipalities().forEach((municipality) => {
-        value += municipality.susceptible;
+        //Sum
+        value += municipality.susceptible[0] + municipality.susceptible[1] + municipality.susceptible[2];
     });
     return value;
 }
@@ -77,7 +79,8 @@ export function getTotalSusceptible(){
 export function getTotalInfected(){
     let value = 0;
     getMunicipalities().forEach((municipality) => {
-        value += municipality.infected;
+        //Sum
+        value += municipality.infected[0] + municipality.infected[1] + municipality.infected[2];
     });
     return value;
 }
@@ -85,7 +88,8 @@ export function getTotalInfected(){
 export function getTotalRecovered(){
     let value = 0;
     getMunicipalities().forEach((municipality) => {
-        value += municipality.recovered;
+        //Sum
+        value += municipality.recovered[0] + municipality.recovered[1] + municipality.recovered[2];
     });
     return value;
 }

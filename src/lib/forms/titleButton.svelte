@@ -1,6 +1,13 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	export let text: string = 'Button';
-	export let onClick: () => void = () => {};
+	export let onClick: () => void = () =>
+	{
+		if(text === "Simulation")
+			goto('/simulation');
+		if(text === "Sources")
+			goto('/sources');
+	};
 
 	export let bgColor: string = '#827E9A';
 	export let textColor: string = '#FFFFFF';

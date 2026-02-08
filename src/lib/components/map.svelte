@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { getMunicipalityCentroid } from '$lib/simulation/simulation.js';
-	import { getMunicipalities } from '$lib/simulation/simulationData.js';
+	import { getMunicipalities, municipalityInfected, municipalityPopulation } from '$lib/simulation/simulationData.js';
+	import { selectedMunicipality } from '$lib/simulation/storables.js';
 
 	/* =====================
 	   Public component API
@@ -18,6 +19,9 @@
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D;
 	let mapImage: HTMLImageElement;
+	let circleHitMap = []; //For checking clicks on circles
+	let currentSelection;
+	selectedMunicipality.subscribe(v => currentSelection = v);
 
 	const rect = { x: 0, y: 0, width, height };
 
@@ -39,6 +43,7 @@
 
 	onMount(async () => {
 		ctx = canvas.getContext('2d')!;
+		canvas.addEventListener("click", onCanvasClick);
 		await drawNL();
 	});
 
@@ -127,6 +132,8 @@
 	function drawMunicipalityCircles(radius = 3) {
 		ctx.save();
 
+		circleHitMap.length = 0; // reset per frame
+
 		const municipalityList = getMunicipalities();
 
 		for (const municipality of municipalityList) {
@@ -135,14 +142,57 @@
 
 			ctx.beginPath();
 			ctx.arc(x, y, radius, 0, Math.PI * 2);
+			if (municipality.gemeenteCode === currentSelection) {
+				ctx.strokeStyle = 'blue';
+				ctx.lineWidth = 2;
+				ctx.stroke();
+			}
 			ctx.fillStyle = valueToColor(
-				municipality.infected / municipality.population
+				municipalityInfected(municipality.gemeenteCode) /
+				municipalityPopulation(municipality.gemeenteCode)
 			);
 			ctx.fill();
+
+			// Register for hit detection
+			circleHitMap.push({
+				x,
+				y,
+				radius,
+				gemeenteCode: municipality.gemeenteCode
+			});
 		}
 
 		ctx.restore();
 	}
+
+	function getCanvasCoords(event, canvas) {
+		const rect = canvas.getBoundingClientRect();
+
+		const scaleX = canvas.width / rect.width;
+		const scaleY = canvas.height / rect.height;
+
+		return {
+			x: (event.clientX - rect.left) * scaleX,
+			y: (event.clientY - rect.top) * scaleY,
+		};
+	}
+
+	//Detect if mouse pressed so that we can do something to municipality circles
+	function onCanvasClick(event) {
+		const { x: mouseX, y: mouseY } = getCanvasCoords(event, canvas);
+
+		for (const circle of circleHitMap) {
+			const dx = mouseX - circle.x;
+			const dy = mouseY - circle.y;
+
+			if (dx * dx + dy * dy <= circle.radius * circle.radius) {
+				selectedMunicipality.set(circle.gemeenteCode);
+				return;
+			}
+		}
+	}
+
+
 </script>
 
 <canvas

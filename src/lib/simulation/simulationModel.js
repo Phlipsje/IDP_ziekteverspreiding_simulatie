@@ -4,11 +4,11 @@ import {
 	getMunicipalities, setMunicipalities, getMunicipalityStats
 } from './simulationData.js';
 
-const transmissionRate = 0.42; //R0 / recovery time (5.88 / 14)
+const transmissionRate = 0.32; //0.42 = R0 / recovery time (5.88 / 14)
 const dt = 1.0; //One day per tick
-const contactScaling = 1.3; //Exponent for how many more contacts for bigger municipalities
+const contactScaling = 1.7; //Exponent for how many more contacts for bigger municipalities
 const travelFactor = 0.7; //Fraction of population of municipality that travels to every other municipality
-const distanceDecay = 0.9; //travelFactor*(KMs_distance)^this is the effect of distance
+const distanceDecay = 0.75; //travelFactor*(KMs_distance)^this is the effect of distance
 const recoveryRate = [0.12, 0.07, 0.04]; // 0–17, 18–65, 65+ (inverse of recovery time)
 const waningRecoveryRate = [0.0001, 0.0001, 0.0001]; // 0–17, 18–65, 65+
 const vaccinationRate = [0.001, 0.001, 0.001]; // 0–17, 18–65, 65+ (average amount of vaccines per day, divide by 2 for needing about 2 vaccines)

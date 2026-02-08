@@ -11,11 +11,13 @@
 
 	import Map from '$lib/components/map.svelte';
 	import SirGraph from '$lib/components/sirGraph.svelte';
+	import SelectedMunicipality from '$lib/components/selectedMunicipality.svelte';
 
 	//Simulation
 	import { onMount } from "svelte";
 	import { load, start, step } from '$lib/simulation/simulation.js';
 	import { getStats } from '$lib/simulation/simulationStats';
+	import { selectedMunicipality } from '$lib/simulation/storables.js';
 
 	//Update and draw loop
 	const updateHz = 20;
@@ -113,6 +115,7 @@
 					class="flex flex-col items-start w-[398px] h-full p-1 bg-white border rounded-[5px] border-[#A3A3A3]"
 				>
 					<!-- Selected municipality data -->
+					<!-- <SelectedMunicipality/> -->
 				</div>
 			</div>
 		</div>
